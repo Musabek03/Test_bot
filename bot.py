@@ -2,8 +2,9 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
+from decouple import config as env
 
-API_TOKEN = "8559143410:AAFAD-a_QoFqQ8CqJ1G757dquDhQoHKcLAI"
+API_TOKEN = env('API_TOKEN')
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()

@@ -32,3 +32,8 @@ class DashboardSerializer(serializers.Serializer):
   users_with_attempts = serializers.IntegerField()
   top_users = serializers.ListField()
   hard_questions = serializers.ListField()
+
+
+class ImportQuestionSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    

@@ -1,5 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from .views import BotUserViewSet,QuestionViewSet,TestAttemptViewSet,TestAttemptDetailViewSet,DashboardViewSet
+
 from django.urls import path, include
 
 router = DefaultRouter()
@@ -12,4 +13,5 @@ router.register('admin/attempts', TestAttemptViewSet, basename='attempt')
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/dashboard/', DashboardViewSet.as_view()),
+    #path('admin/import-questions/', QuestionImportViewSet.as_view(), name='import-questions'),
 ]

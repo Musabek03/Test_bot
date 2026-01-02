@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from .models import BotUser,Question, TestAttempt, AttemptDetail
-from .serializers import BotUserSerializer,QuestionSerializer,TestAttemptSerializer, AttemptDetailSerializer,DashboardSerializer
-from rest_framework import viewsets,filters
+from .serializers import BotUserSerializer,QuestionSerializer,TestAttemptSerializer, AttemptDetailSerializer,DashboardSerializer, ImportQuestionSerializer
+from rest_framework import viewsets,filters,status
 from rest_framework.views import APIView
 from django.db.models import Count, Sum
+import pandas 
+from rest_framework.decorators import action
 
 
 class BotUserViewSet(viewsets.ModelViewSet):
@@ -53,3 +55,78 @@ class DashboardViewSet(APIView):
 
         serializer = DashboardSerializer(data)
         return Response(serializer.data)
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    # Bul jerler o'zgerissiz turadi
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+    
+    @action(detail=False, methods=['POST'], url_path='import-excel', serializer_class=ImportQuestionSerializer)
+    def import_excel(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        file = serializer.validated_data['file']
+        
+        try:
+            df = pandas.read_excel(file).fillna('')
+            
+            questions = [
+                Question(
+                    text=row['text'],
+                    option_a=row['option_a'],
+                    option_b=row['option_b'],
+                    option_c=row['option_c'],
+                    option_d=row['option_d'],
+                    correct_answer=row['correct_answer'],
+                    is_active=True
+                )
+                for index, row in df.iterrows()
+            ]
+            
+            Question.objects.bulk_create(questions)
+            return Response({"status": "Success", "count": len(questions)}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+# class QuestionImportViewSet(viewsets.ModelViewSet):
+#     queryset = Question.objects.all()
+#     serializer_class = QuestionSerializer
+
+#     @action(detail=False, methods=['POST'], url_path='import-excel', serializer_class=ImportQuestionSerializer)
+
+#     def import_excel(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+        
+#         file = serializer.validated_data['file']
+        
+#         try:
+          
+#             df = pandas.read_excel(file).fillna('')
+            
+#             questions = [
+#                 Question(
+#                     text=row['text'],
+#                     option_a=row['option_a'],
+#                     option_b=row['option_b'],
+#                     option_c=row['option_c'],
+#                     option_d=row['option_d'],
+#                     correct_answer=row['correct_answer'],
+#                     is_active=True
+#                 )
+#                 for index, row in df.iterrows()
+#             ]
+            
+#             Question.objects.bulk_create(questions)
+
+#             return Response({"status": "Success", "count": len(questions)}, status=status.HTTP_201_CREATED)
+
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
