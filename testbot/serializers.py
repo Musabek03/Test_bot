@@ -25,4 +25,10 @@ class AttemptDetailSerializer(serializers.ModelSerializer):
         model = AttemptDetail
         fields = ('id', 'question','user_answer','is_correct')
 
-        
+
+class DashboardSerializer(serializers.Serializer):
+  
+  total_users = serializers.IntegerField()
+  users_with_attempts = serializers.IntegerField()
+  top_users = serializers.ListField()
+  hard_questions = serializers.ListField()
