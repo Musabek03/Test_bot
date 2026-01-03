@@ -15,11 +15,11 @@ class BotUserViewSet(viewsets.ModelViewSet):
 
 class TestAttemptViewSet(viewsets.ModelViewSet):
     queryset = TestAttempt.objects.all()
-    serializer_class = AttemptDetailSerializer
+    serializer_class = TestAttemptSerializer
 
 class TestAttemptDetailViewSet(viewsets.ModelViewSet):
     queryset = AttemptDetail.objects.all()
-    serializer_class = TestAttemptSerializer
+    serializer_class = AttemptDetailSerializer
 
 class DashboardViewSet(APIView):
 
@@ -56,6 +56,9 @@ class DashboardViewSet(APIView):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['text']
+
 
     
     @action(detail=False, methods=['POST'], url_path='import-excel', serializer_class=ImportQuestionSerializer)
@@ -71,10 +74,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
             questions = [
                 Question(
                     text=row['text'],
-                    option_a=row['option_a'],
-                    option_b=row['option_b'],
-                    option_c=row['option_c'],
-                    option_d=row['option_d'],
+                    option_a=row['a'],
+                    option_b=row['b'],
+                    option_c=row['c'],
+                    option_d=row['d'],
                     correct_answer=row['correct_answer'],
                     is_active=True
                 )
