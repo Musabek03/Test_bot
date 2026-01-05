@@ -1,0 +1,1 @@
+ /api/admin/dashboard/ - APIView menen jazilgani ushin , API ROOT ta joq. Qoldan jazip kirin. 

@@ -5,12 +5,9 @@ import logging
 import random
 import django
 from decouple import config as env
-
-
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
-
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -23,8 +20,8 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from asgiref.sync import sync_to_async
 from django.conf import settings
-
 from testbot.models import BotUser, Question, TestAttempt, AttemptDetail
+
 
 API_TOKEN = env('API_TOKEN')
 
@@ -48,9 +45,7 @@ def create_user(tg_id, name):
 
 @sync_to_async
 def get_random_questions_data(count=10):
-    """
-    Bazadan aktiv sorawlardı alıp, olardı aralastırıp qaytaradı.
-    """
+
     questions_query = list(Question.objects.filter(is_active=True).order_by('?')[:count])
     
     questions_data = []
@@ -216,7 +211,6 @@ async def process_answer(callback: types.CallbackQuery, state: FSMContext):
         await state.set_data(data)
         await send_question(callback.message, questions[next_index], next_index, len(questions))
     else:
-        # Test juwmaqlandı
         await finish_test(callback.message, state, data)
 
 async def finish_test(message: types.Message, state: FSMContext, data):
@@ -227,22 +221,18 @@ async def finish_test(message: types.Message, state: FSMContext, data):
     total = len(data['questions'])
     answers = data['answers']
     
-    # Bazaga saqlaymız
     await save_test_result(message.chat.id, answers, score)
     
     result_text = f"🏁 <b>Test juwmaqlandı!</b>\n\n"
     result_text += f"✅ Nátiyje: {total} sorawdan {score} durıs taptıńız.\n\n"
     
-    # Qátelerdi kórsetiw
     if score < total:
         result_text += "<b>❌ Qáte juwaplar:</b>\n\n"
         counter = 1
         for q_id, ans_data in answers.items():
             if not ans_data['is_correct']:
-                # Qáte ketken sorawdı tabamız
                 q_text = ans_data['q_text']
                 
-                # Paydalanıwshı tańlaǵan variant tekstin tabıw
                 user_choice_text = "Belgisiz"
                 correct_choice_text = "Belgisiz"
                 
